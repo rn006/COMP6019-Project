@@ -12,6 +12,8 @@ public class PlayerMovement : MonoBehaviour
     public int noBomb = 3;
     public GameObject bombPrefab;
 
+    public int currentHealth = 3;
+
 
     // Use this for initialization 
     void Start()
