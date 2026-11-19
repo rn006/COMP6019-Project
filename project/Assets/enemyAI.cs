@@ -15,7 +15,7 @@ public class enemyAI : MonoBehaviour
         escape
     }
 
-    States_state = States.idle;
+    States _state = States.idle;
 
     
 
