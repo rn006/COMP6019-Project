@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using System.Collections;
 
 public class PlayerMovement : MonoBehaviour
 {
@@ -14,7 +15,6 @@ public class PlayerMovement : MonoBehaviour
 
     public int currentHealth = 3;
 
-
     // Use this for initialization 
     void Start()
     {
@@ -27,7 +27,7 @@ public class PlayerMovement : MonoBehaviour
 
     private void Update()
     {   // Store the input axes. 
-        float h = Input.GetAxisRaw("Horizontal");
+             float h = Input.GetAxisRaw("Horizontal");
         float v = Input.GetAxisRaw("Vertical");
 
         // Move the player around the scene. 
@@ -35,6 +35,7 @@ public class PlayerMovement : MonoBehaviour
         Turning();
         Animating(h, v);
         dropBomb();
+        Attack();
     }
 
 
@@ -92,6 +93,75 @@ public class PlayerMovement : MonoBehaviour
 
 
         }
+    }
+
+    // for testing attack
+    public int attackDamage = 25;
+    public float attackRange = 2f;
+    bool poisoned = false;
+    void Attack()
+    {
+        if (Input.GetKeyDown(KeyCode.F))
+        {
+            // Find all snakes in the scene
+            GameObject[] snakes = GameObject.FindGameObjectsWithTag("Snake");
+
+            foreach (GameObject snake in snakes)
+            {
+                // Calculate distance between player and snake
+                float distance = Vector3.Distance(
+                    transform.position, snake.transform.position);
+
+                // If the snake is within attack range
+                if (distance <= attackRange)
+                {
+                    snake.GetComponent<Snake>().Hit(attackDamage);
+                }
+            }
+        }
+    }
+    public void Hit(int _damage)
+    {
+        // Remove damage from player health
+        currentHealth -= _damage;
+
+        Debug.Log("Player HP: " + currentHealth);
+
+        // Check if player has died
+        if (currentHealth <= 0)
+        {
+            currentHealth = 0;
+
+            Debug.Log("Player has died");
+
+            // Add player death functionality here
+        }
+    }
+    public void Poison(int _damage)
+    {
+        // Check if player is not already poisoned
+        if (!poisoned && currentHealth > 0)
+        {
+            StartCoroutine(PoisonDamage(_damage));
+        }
+    }
+
+    IEnumerator PoisonDamage(int _damage)
+    {
+        poisoned = true;
+
+        // Wait 1.5 seconds before dealing poison damage
+        yield return new WaitForSeconds(1.5f);
+
+        if (currentHealth > 0)
+        {
+            Hit(_damage);
+        }
+
+        // Wait remaining duration of poison
+        yield return new WaitForSeconds(1f);
+
+        poisoned = false;
     }
 }
 
